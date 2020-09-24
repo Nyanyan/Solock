@@ -52,43 +52,45 @@ solution = []
 
 def search(phase, depth, state, banned_pins):
     global solution
-    lower_cross = set([state[i] for i in [9, 10, 11, 12, 13]]) == {0}
-    upper_cross = len(set([state[i] for i in [1, 3, 4, 5, 7]])) == 1
-    upper = set([state[i] for i in [0, 2, 6, 8, 1, 3, 4, 5, 7]]) == {0}
+    if phase == 0:
+        set_clocks = set(state[i] for i in [9, 10, 11, 12, 13])
+    elif phase == 1:
+        set_clocks = set(state[i] for i in [1, 3, 4, 5, 7])
+    elif phase == 2:
+        set_clocks = set(state[i] for i in [0, 2, 6, 8, 1, 3, 4, 5, 7])
     if depth == 0:
-        if phase == 0:
-            return lower_cross
+        if phase == 0 or phase == 2:
+            return set_clocks == {0}
         elif phase == 1:
-            return upper_cross
-        elif phase == 2:
-            return lower_cross and upper_cross and upper
+            return len(set_clocks) == 1
     direction = 0 if phase == 0 else 1
     if phase == 0:
-        pin_candidate = range(4)
+        if len(set_clocks) > 1:
+            pin_candidate = [2, 3]
+        else:
+            pin_candidate = [0]
     elif phase == 1:
-        pin_candidate = range(1, 5)
+        pin_candidate = [1, 2]
     elif phase == 2:
-        pin_candidate = range(3, 5)
+        pin_candidate = [3, 4]
     for num_of_pins in pin_candidate: # pins that are pulled
-        for pins_up in combinations(range(4), num_of_pins):
+        for pins_up in combs[num_of_pins]:
             pins = [True if i in pins_up else False for i in range(4)]
             if pins in banned_pins[direction]:
                 continue
             move_clocks_time = [state[i] for i in y_move_clocks(pins, direction)]
             not_move_clocks = n_move_clocks(pins, direction)
             if phase == 0:
-                not_move_clocks -= set([0, 2, 6, 8, 1, 3, 4, 5, 7])
+                not_move_clocks -= {0, 2, 6, 8, 1, 3, 4, 5, 7}
             elif phase == 1:
-                not_move_clocks -= set([0, 2, 6, 8, 9, 10, 11, 12, 13])
+                not_move_clocks -= {0, 2, 6, 8, 9, 10, 11, 12, 13}
             elif phase == 2:
-                not_move_clocks -= set([9, 10, 11, 12, 13])
-            if not lower_cross or not upper_cross:
-                not_move_clocks -=  set([0, 2, 6, 8])
-            time_candidate = set([state[i] for i in not_move_clocks])
-            if phase == 2 and len(set([state[i] for i in range(9)])) == 1:
+                not_move_clocks -= {9, 10, 11, 12, 13}
+            time_candidate = set(state[i] for i in not_move_clocks)
+            if phase == 2 and len(set(state[i] for i in range(9))) == 1:
                 twist_candidate = set([-state[0] % 12])
             else:
-                twist_candidate = set([(i - j) % 12 for i in time_candidate for j in move_clocks_time])
+                twist_candidate = set((i - j) % 12 for i in time_candidate for j in move_clocks_time)
             for twist in twist_candidate:
                 if twist == 0:
                     continue
@@ -96,7 +98,14 @@ def search(phase, depth, state, banned_pins):
                 n_banned_pins = [[i for i in j] for j in banned_pins]
                 n_banned_pins[direction].append(pins)
                 solution.append([pins, direction, twist])
-                if search(phase, depth - 1, n_state, n_banned_pins):
+                if phase == 0:
+                    n_set_clocks = set(n_state[i] for i in [9, 10, 11, 12, 13])
+                elif phase == 1:
+                    n_set_clocks = set(n_state[i] for i in [1, 3, 4, 5, 7])
+                elif phase == 2:
+                    n_set_clocks = set(n_state[i] for i in [0, 2, 6, 8, 1, 3, 4, 5, 7])
+                prunning = len(set_clocks) - len(n_set_clocks) >= 0 or len(n_set_clocks) == 1
+                if prunning and search(phase, depth - 1, n_state, n_banned_pins):
                     return True
                 solution.pop()
                 #n_banned_pins[direction].pop()
@@ -117,9 +126,34 @@ def solver(state):
             return -1
     return solution
 
+combs = []
+for i in range(5):
+    combs.append([j for j in combinations(range(4), i)])
+
+from time import time
 '''
+strt = time()
 test_cube = [4, 4, 2, 6, 8, 9, 10, 6, 0, 6, 10, 5, 9, 1] # UR1+ DR4+ DL2- UL1- U2+ R3- D2+ L2+ ALL3+ y2 U4- R5+ D1+ L4+ ALL1+ DL
 #test_cube = [5, 9, 6, 7, 9, 2, 8, 5, 1, 6, 9, 6, 0, 0] # UR1- DR2- DL5- UL0+ U5+ R5+ D5- L0+ ALL0+ y2 U6+ R3+ D0+ L6+ ALL3+
 print(test_cube)
-print(solver(test_cube))
+res = solver(test_cube)
+print(res)
+if res != -1:
+    print(len(res), 'moves')
+print(time() - strt)
 '''
+from random import randint
+tims = []
+cnt = 0
+num = 20
+for _ in range(num):
+    strt = time()
+    test_cube = [randint(0, 11) for _ in range(14)]
+    res = solver(test_cube)
+    if res != -1:
+        print(len(res), 'moves')
+        tim = time() - strt
+        print(tim, 'sec')
+        tims.append(tim)
+        cnt += 1
+print(cnt, '/', num, 'avg', sum(tims) / cnt, 'sec')
