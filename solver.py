@@ -130,7 +130,7 @@ combs = []
 for i in range(5):
     combs.append([j for j in combinations(range(4), i)])
 
-
+'''
 from time import time
 from random import randint
 tims = []
@@ -147,3 +147,4 @@ for _ in range(num):
         tims.append(tim)
         cnt += 1
 print(cnt, '/', num, 'avg', sum(tims) / cnt, 'sec', 'max', max(tims), 'sec')
+'''
