@@ -51,46 +51,65 @@ def move(state, pins, direction, twist):
 
 solution = []
 
-def search(depth, state, banned_pins):
+def search(phase, depth, state, banned_pins):
     global solution
+    lower_cross = set([state[i] for i in [9, 10, 11, 12, 13]]) == {0}
+    upper_cross = set([state[i] for i in [1, 3, 4, 5, 7]]) == {0}
+    corner = set([state[i] for i in [0, 2, 6, 8]]) == {0}
     if depth == 0:
-        return set(state) == {0}
-    for direction in range(2): # 0: lower, 1: upper
-        pin_candidate = range(1, 5) if direction else range(4)
-        for num_of_pins in pin_candidate: # pins that are pulled
-            for pins_up in combinations(range(4), num_of_pins):
-                pins = [True if i in pins_up else False for i in range(4)]
-                if pins in banned_pins[direction]:
+        if phase == 0:
+            return lower_cross
+        elif phase == 1:
+            return upper_cross
+        elif phase == 2:
+            return lower_cross and upper_cross and corner
+    direction = 0 if phase == 0 else 1
+    if phase == 0:
+        pin_candidate = range(4)
+    elif phase == 1:
+        pin_candidate = range(1, 5)
+    elif phase == 2:
+        pin_candidate = range(3, 5)
+    for num_of_pins in pin_candidate: # pins that are pulled
+        for pins_up in combinations(range(4), num_of_pins):
+            pins = [True if i in pins_up else False for i in range(4)]
+            if pins in banned_pins[direction]:
+                continue
+            move_clocks_time = [state[i] for i in y_move_clocks(pins, direction)]
+            not_move_clocks = n_move_clocks(pins, direction)
+            if phase == 0:
+                not_move_clocks -= set([0, 2, 6, 8, 1, 3, 4, 5, 7])
+            elif phase == 1:
+                not_move_clocks -= set([0, 2, 6, 8, 9, 10, 11, 12, 13])
+            elif phase == 2:
+                not_move_clocks -= set([9, 10, 11, 12, 13])
+            if not lower_cross or not upper_cross:
+                not_move_clocks -=  set([0, 2, 6, 8])
+            time_candidate = set([state[i] for i in not_move_clocks])
+            twist_candidate = set([(i - j) % 12 for i in time_candidate for j in move_clocks_time])
+            for twist in twist_candidate:
+                if twist == 0:
                     continue
-                move_clocks_time = [state[i] for i in y_move_clocks(pins, direction)]
-                not_move_clocks = n_move_clocks(pins, direction)
-                if direction:
-                    not_move_clocks -= set([9, 10, 11, 12, 13])
-                else:
-                    not_move_clocks -= set([1, 3, 4, 5, 7])
-                time_candidate = [state[i] for i in not_move_clocks]
-                twist_candidate = set([(i - j) % 12 for i in time_candidate for j in move_clocks_time])
-                for twist in twist_candidate:
-                    if twist == 0:
-                        continue
-                    n_state = move(state, pins, direction, twist)
-                    n_banned_pins = [[i for i in j] for j in banned_pins]
-                    n_banned_pins[direction].append(pins)
-                    solution.append([pins, direction, twist])
-                    if search(depth - 1, n_state, n_banned_pins):
-                        return True
-                    solution.pop()
-                    #n_banned_pins[direction].pop()
+                n_state = move(state, pins, direction, twist)
+                n_banned_pins = [[i for i in j] for j in banned_pins]
+                n_banned_pins[direction].append(pins)
+                solution.append([pins, direction, twist])
+                if search(phase, depth - 1, n_state, n_banned_pins):
+                    return True
+                solution.pop()
+                #n_banned_pins[direction].pop()
     return False
 
 def solver(state):
     global solution
-    for depth in range(13):
-        solution = []
-        if search(depth, state, [[], []]):
-            return solution
-        print(depth)
-    return -1
+    for phase in range(3):
+        for depth in range(6):
+            solution = []
+            if search(phase, depth, state, [[], []]):
+                print(solution)
+                break
+        else:
+            return -1
 
 #test_cube = [3, 6, 0, 3, 6, 3, 0, 0, 0, 9, 9, 9, 0, 0]
 test_cube = [5, 9, 6, 7, 9, 2, 8, 5, 1, 6, 9, 6, 0, 0] # UR1- DR2- DL5- UL0+ U5+ R5+ D5- L0+ ALL0+ y2 U6+ R3+ D0+ L6+ ALL3+
