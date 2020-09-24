@@ -34,8 +34,7 @@ def y_move_clocks(pins, direction):
         for i, j in enumerate(pins):
             if not j:
                 res.extend(clock_candidate[i])
-    res = set(res)
-    return res
+    return set(res)
 
 def n_move_clocks(pins, direction):
     res = set(range(14)) - y_move_clocks(pins, direction)
@@ -119,7 +118,7 @@ def solver(state):
     return solution
 
 '''
-test_cube = [4, 4, 2, 6, 8, 9, 10, 6, 0, 6, 10, 5, 9, 6] # UR1+ DR4+ DL2- UL1- U2+ R3- D2+ L2+ ALL3+ y2 U4- R5+ D1+ L4+ ALL1+ DL
+test_cube = [4, 4, 2, 6, 8, 9, 10, 6, 0, 6, 10, 5, 9, 1] # UR1+ DR4+ DL2- UL1- U2+ R3- D2+ L2+ ALL3+ y2 U4- R5+ D1+ L4+ ALL1+ DL
 #test_cube = [5, 9, 6, 7, 9, 2, 8, 5, 1, 6, 9, 6, 0, 0] # UR1- DR2- DL5- UL0+ U5+ R5+ D5- L0+ ALL0+ y2 U6+ R3+ D0+ L6+ ALL3+
 print(test_cube)
 print(solver(test_cube))
