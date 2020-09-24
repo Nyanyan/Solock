@@ -72,7 +72,7 @@ def search(phase, depth, state, banned_pins):
     elif phase == 1:
         pin_candidate = [1, 2]
     elif phase == 2:
-        pin_candidate = [3, 4]
+        pin_candidate = [2, 3, 4]
     for num_of_pins in pin_candidate: # pins that are pulled
         for pins_up in combs[num_of_pins]:
             pins = [True if i in pins_up else False for i in range(4)]
@@ -156,4 +156,4 @@ for _ in range(num):
         print(tim, 'sec')
         tims.append(tim)
         cnt += 1
-print(cnt, '/', num, 'avg', sum(tims) / cnt, 'sec')
+print(cnt, '/', num, 'avg', sum(tims) / cnt, 'sec', 'max', max(tims), 'sec')
