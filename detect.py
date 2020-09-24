@@ -2,7 +2,7 @@ import cv2
 from math import sin, cos, pi
 from statistics import variance
 
-def detect(direction):
+def detector(direction):
     capture = cv2.VideoCapture(0)
     clocks = [-1 for _ in range(9)]
     #while(True):
