@@ -2,8 +2,6 @@ from time import time, sleep
 import serial
 import RPi.GPIO as GPIO
 
-# アクチュエータを動かすコマンドを送る
-# Send commands to move actuators
 def send_command(num, arg1, arg2=None, arg3=None):
     com = str(arg1)
     if arg2 != None:
