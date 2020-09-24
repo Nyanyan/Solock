@@ -54,15 +54,15 @@ solution = []
 def search(phase, depth, state, banned_pins):
     global solution
     lower_cross = set([state[i] for i in [9, 10, 11, 12, 13]]) == {0}
-    upper_cross = set([state[i] for i in [1, 3, 4, 5, 7]]) == {0}
-    corner = set([state[i] for i in [0, 2, 6, 8]]) == {0}
+    upper_cross = len(set([state[i] for i in [1, 3, 4, 5, 7]])) == 1
+    upper = set([state[i] for i in [0, 2, 6, 8, 1, 3, 4, 5, 7]]) == {0}
     if depth == 0:
         if phase == 0:
             return lower_cross
         elif phase == 1:
             return upper_cross
         elif phase == 2:
-            return lower_cross and upper_cross and corner
+            return lower_cross and upper_cross and upper
     direction = 0 if phase == 0 else 1
     if phase == 0:
         pin_candidate = range(4)
@@ -86,7 +86,10 @@ def search(phase, depth, state, banned_pins):
             if not lower_cross or not upper_cross:
                 not_move_clocks -=  set([0, 2, 6, 8])
             time_candidate = set([state[i] for i in not_move_clocks])
-            twist_candidate = set([(i - j) % 12 for i in time_candidate for j in move_clocks_time])
+            if phase == 2 and len(set([state[i] for i in range(9)])) == 1:
+                twist_candidate = set([-state[0] % 12])
+            else:
+                twist_candidate = set([(i - j) % 12 for i in time_candidate for j in move_clocks_time])
             for twist in twist_candidate:
                 if twist == 0:
                     continue
@@ -102,19 +105,22 @@ def search(phase, depth, state, banned_pins):
 
 def solver(state):
     global solution
+    strt = 0
+    solution = []
     for phase in range(3):
         for depth in range(6):
-            solution = []
             if search(phase, depth, state, [[], []]):
-                print(solution)
+                for pins, direction, twist in solution[strt:]:
+                    state = move(state, pins, direction, twist)
+                strt = len(solution)
                 break
         else:
             return -1
+    return solution
 
 #test_cube = [3, 6, 0, 3, 6, 3, 0, 0, 0, 9, 9, 9, 0, 0]
 test_cube = [5, 9, 6, 7, 9, 2, 8, 5, 1, 6, 9, 6, 0, 0] # UR1- DR2- DL5- UL0+ U5+ R5+ D5- L0+ ALL0+ y2 U6+ R3+ D0+ L6+ ALL3+
 print(test_cube)
-
 print(solver(test_cube))
 
 
