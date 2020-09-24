@@ -104,9 +104,9 @@ def search(phase, depth, state, banned_pins):
                     n_set_clocks = set(n_state[i] for i in [1, 3, 4, 5, 7])
                 elif phase == 2:
                     n_set_clocks = set(n_state[i] for i in [0, 2, 6, 8, 1, 3, 4, 5, 7])
-                prunning = len(set_clocks) - len(n_set_clocks) >= 0 or len(n_set_clocks) == 1
-                if prunning and search(phase, depth - 1, n_state, n_banned_pins):
-                    return True
+                if len(n_set_clocks) <= depth:
+                    if search(phase, depth - 1, n_state, n_banned_pins):
+                        return True
                 solution.pop()
                 #n_banned_pins[direction].pop()
     return False
@@ -145,7 +145,7 @@ print(time() - strt)
 from random import randint
 tims = []
 cnt = 0
-num = 20
+num = 100
 for _ in range(num):
     strt = time()
     test_cube = [randint(0, 11) for _ in range(14)]
