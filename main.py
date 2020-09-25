@@ -7,7 +7,7 @@ from detector import detector
 
 def create_clock(state=None):
     grid = 28
-    offset = 50
+    offset = 100
     dis = 10
     radius = 20
     canvas.delete()
@@ -42,12 +42,46 @@ def create_clock(state=None):
                 canvas.create_line(x_circle, y_circle, x, y)
     canvas.pack()
 
+def inspection_p():
+    global state, solution
+    def inspection_upper_p():
+        state[10:] = detector(1)
+    def inspection_lower_p():
+        state[:10] = detector(0)
+    def inspection_finish_p():
+        if -1 in set(state):
+            return
+        inspection_lower.place_forget()
+        inspection_upper.place_forget()
+        inspection_finish.place_forget()
+        create_clock(state)
+        solution = solver(state)
+        print(solution)
+    state = [-1 for _ in range(14)]
+    solution = []
+    inspection_upper = tkinter.Button(root, text="upper", command=inspection_upper_p)
+    inspection_upper.place(x=0, y=25)
+    inspection_lower = tkinter.Button(root, text="lower", command=inspection_lower_p)
+    inspection_lower.place(x=0, y=50)
+    inspection_finish = tkinter.Button(root, text="finish", command=inspection_finish_p)
+    inspection_finish.place(x=0, y=75)
 
+def start_medium_p():
+    pass#controller(solution, 300, 0.1)
+
+
+solution = []
 root = tkinter.Tk()
 root.title("Solock")
 root.geometry("320x240")
 canvas = tkinter.Canvas(root, width = 320, height = 240)
 
-create_clock([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1])
+inspection = tkinter.Button(root, text="inspection", command=inspection_p)
+inspection.place(x=0, y=0)
+
+start_medium = tkinter.Button(root, text="start", command=start_medium_p)
+start_medium.place(x=250, y=0)
+
+create_clock()
 
 root.mainloop()
