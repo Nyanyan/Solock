@@ -1,7 +1,9 @@
 const int magnet_threshold = 50;
 const long turn_steps = 400;
-const int step_dir[4] = {11, 9, 14, 7};
-const int step_pul[4] = {12, 10, 15, 8};
+const int step_dir[4] = {9, 14, 11, 7};
+const int step_pul[4] = {10, 15, 12, 8};
+//const int step_dir[4] = {11, 9, 14, 7};
+//const int step_pul[4] = {12, 10, 15, 8};
 
 char buf[30];
 int idx = 0;
@@ -52,6 +54,7 @@ void setup(){
     pinMode(step_dir[i], OUTPUT);
     pinMode(step_pul[i], OUTPUT);
   }
+  Serial.begin(115200);
 }
 
 void loop() {

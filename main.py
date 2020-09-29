@@ -3,7 +3,7 @@ from math import sin, cos, pi
 
 from solver import solver
 from detector import detector
-#from controller import controller
+from controller import controller
 
 def create_clock(state=None):
     grid = 28
@@ -42,13 +42,19 @@ def create_clock(state=None):
                 canvas.create_line(x_circle, y_circle, x, y)
     canvas.pack()
 
+
 def inspection_p():
     global state, solution
+    solution = []
+    state = [-1 for _ in range(14)]
     def inspection_upper_p():
+        global state
         state[10:] = detector(1)
     def inspection_lower_p():
+        global state
         state[:10] = detector(0)
     def inspection_finish_p():
+        global state, solution
         if -1 in set(state):
             return
         inspection_lower.place_forget()
@@ -56,9 +62,8 @@ def inspection_p():
         inspection_finish.place_forget()
         create_clock(state)
         solution = solver(state)
-        print(solution)
-    state = [-1 for _ in range(14)]
-    solution = []
+        print(state)
+        #print(solution)
     inspection_upper = tkinter.Button(root, text="upper", command=inspection_upper_p)
     inspection_upper.place(x=0, y=25)
     inspection_lower = tkinter.Button(root, text="lower", command=inspection_lower_p)
@@ -67,10 +72,11 @@ def inspection_p():
     inspection_finish.place(x=0, y=75)
 
 def start_medium_p():
-    pass#controller(solution, 300, 0.1)
+    controller(solution, 300, 0.2)
 
 
 solution = []
+state = [-1 for _ in range(14)]
 root = tkinter.Tk()
 root.title("Solock")
 root.geometry("320x240")
