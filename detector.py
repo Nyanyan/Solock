@@ -34,7 +34,7 @@ def detector(direction):
                     y_circle = int(y - r * cos(deg * pi / 180))
                     cv2.circle(gray, (x_circle, y_circle), 1, (255, 255, 255), thickness=1, lineType=cv2.LINE_8, shift=0)
                 '''
-                value[tim] //= radius // 3 * 2 - radius // 2
+                value[tim] //= radius // 3
             min_value_idx = value.index(min(value))
             max_value_idx = value.index(max(value))
             arr_out_min = [i for i in value]
@@ -60,7 +60,7 @@ def detector(direction):
     capture.release()
     #cv2.destroyAllWindows()
     if direction == 0:
-        return [(12 - clocks[i]) % 12 for i in [1, 3, 4, 5, 7]]
+        return [clocks[i] for i in [1, 3, 4, 5, 7]]
     else:
         return clocks
 

@@ -7,7 +7,7 @@ from controller import controller
 
 def create_clock(state=None):
     grid = 28
-    offset = 100
+    offset = 50
     dis = 10
     radius = 20
     canvas.delete()
@@ -18,7 +18,7 @@ def create_clock(state=None):
             canvas.create_oval(x, y, x + radius, y + radius)
     if state != None:
         clock_place = [[0, 11], [1], [2, 9], [3], [4], [5], [6, 17], [7], [8, 15], [10], [12], [13], [14], [16]]
-        clock_mirror = [[False, True], [False], [False, True], [False], [False], [False], [False, True], [False], [False, True], [True], [True], [True], [True], [True]]
+        clock_mirror = [[False, True], [False], [False, True], [False], [False], [False], [False, True], [False], [False, True], [False], [False], [False], [False], [False]]
         for clock in range(14):
             for tim in range(12):
                 deg = 30 * tim
@@ -49,13 +49,14 @@ def inspection_p():
     state = [-1 for _ in range(14)]
     def inspection_upper_p():
         global state
-        state[10:] = detector(1)
+        state[:9] = detector(1)
     def inspection_lower_p():
         global state
-        state[:10] = detector(0)
+        state[9:] = detector(0)
     def inspection_finish_p():
         global state, solution
         if -1 in set(state):
+            print('NG', state)
             return
         inspection_lower.place_forget()
         inspection_upper.place_forget()
@@ -64,6 +65,9 @@ def inspection_p():
         solution = solver(state)
         print(state)
         #print(solution)
+        with open('log.txt', mode='w') as f:
+            f.write(str(state) + '\n')
+            f.write(str(solution) + '\n')
     inspection_upper = tkinter.Button(root, text="upper", command=inspection_upper_p)
     inspection_upper.place(x=0, y=25)
     inspection_lower = tkinter.Button(root, text="lower", command=inspection_lower_p)
@@ -72,7 +76,7 @@ def inspection_p():
     inspection_finish.place(x=0, y=75)
 
 def start_medium_p():
-    controller(solution, 300, 0.2)
+    solvingtimevar.set(controller(solution, 600, 0.35))
 
 
 solution = []
@@ -87,6 +91,10 @@ inspection.place(x=0, y=0)
 
 start_medium = tkinter.Button(root, text="start", command=start_medium_p)
 start_medium.place(x=250, y=0)
+
+solvingtimevar = tkinter.StringVar(master=root, value='info')
+solvingtime = tkinter.Label(textvariable=solvingtimevar)
+solvingtime.place(x=120, y=20)
 
 create_clock()
 

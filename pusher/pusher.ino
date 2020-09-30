@@ -5,35 +5,39 @@ int idx = 0;
 long data[4];
 
 void push(int sol0, int sol1, int sol2, int sol3) {
-  if (sol0){
-    digitalWrite(pushers[0], HIGH);
-  } else {
-    digitalWrite(pushers[4], HIGH);
+  for (int i = 0; i < 3; i++) {
+    if (sol0) {
+      digitalWrite(pushers[0], HIGH);
+    } else {
+      digitalWrite(pushers[4], HIGH);
+    }
+    if (sol1) {
+      digitalWrite(pushers[1], HIGH);
+    } else {
+      digitalWrite(pushers[5], HIGH);
+    }
+    if (sol2) {
+      digitalWrite(pushers[2], HIGH);
+    } else {
+      digitalWrite(pushers[6], HIGH);
+    }
+    if (sol3) {
+      digitalWrite(pushers[3], HIGH);
+    } else {
+      digitalWrite(pushers[7], HIGH);
+    }
+    delay(50);
+    for (int j = 0; j < 8; j++)
+      digitalWrite(pushers[j], LOW);
+    delay(50);
   }
-  if (sol1){
-    digitalWrite(pushers[1], HIGH);
-  } else {
-    digitalWrite(pushers[5], HIGH);
-  }
-  if (sol2){
-    digitalWrite(pushers[2], HIGH);
-  } else {
-    digitalWrite(pushers[6], HIGH);
-  }
-  if (sol3){
-    digitalWrite(pushers[3], HIGH);
-  } else {
-    digitalWrite(pushers[7], HIGH);
-  }
-  delay(100);
-  for (int i = 0; i < 8; i++)
-    digitalWrite(pushers[i], LOW);
 }
 
 void setup() {
   for (int i = 0; i < 8; i++)
     pinMode(pushers[i], OUTPUT);
   Serial.begin(115200);
+  Serial.println("begin");
 }
 
 void loop() {
