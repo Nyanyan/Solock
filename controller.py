@@ -12,7 +12,7 @@ def send_command(num, arg1, arg2=None, arg3=None):
             com += str(int(i)) + ' '
     ser_motor[num].write((com + '\n').encode())
 
-def controller(solution, rpm, slp_tim):
+def controller(solution, rpm, slp_tim, ratio):
     strt_solv = time()
     for pins, direction, twist in solution:
         #print(pins, direction, twist)
@@ -23,7 +23,7 @@ def controller(solution, rpm, slp_tim):
         if twist_fixed > 180:
             twist_fixed = twist_fixed - 360
         send_command(1, twist_fixed, rpm, move_motors)
-        slp_tim_motor = 2 * 60 / rpm * abs(twist_fixed) / 360 * 1.4
+        slp_tim_motor = 2 * 60 / rpm * abs(twist_fixed) / 360 * ratio
         sleep(slp_tim_motor)
     solv_time = str(int((time() - strt_solv) * 1000) / 1000).ljust(5, '0')
     return solv_time

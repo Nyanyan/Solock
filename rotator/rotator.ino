@@ -22,7 +22,6 @@ void move_motor(long deg, long spd, int motor0, int motor1, int motor2, int moto
   long slope = 50;
   bool motor_hl = false;
   long accel = min(steps / 2, max(0, (max_time - avg_time) / slope));
-  //digitalWrite(step_dir[num1], LOW);
   for (int i = 0; i < accel; i++) {
     motor_hl = !motor_hl;
     if (motor0) digitalWrite(step_pul[0], motor_hl);
