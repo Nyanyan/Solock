@@ -1,3 +1,5 @@
+# coding:utf-8
+
 import tkinter
 from math import sin, cos, pi
 

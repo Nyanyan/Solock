@@ -1,3 +1,5 @@
+# coding:utf-8
+
 import cv2
 from math import sin, cos, pi
 from statistics import variance
