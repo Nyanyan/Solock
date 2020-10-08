@@ -100,6 +100,7 @@ def search(phase, depth, state, banned_pins):
                     twist_candidate = set([-state[9] % 12])
                 else:
                     twist_candidate = set((j - i) % 12 for i in time_candidate for j in move_clocks_time)
+            twist_candidate = sorted(list(twist_candidate))
             for twist in twist_candidate:
                 if twist == 0:
                     continue
