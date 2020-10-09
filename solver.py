@@ -78,7 +78,7 @@ def solver_p(phase, state, pre_solution, pre_cost, max_cost, corner_cost):
         #print(phase, depth)
         solutions = search(phase, depth, state, 0, pre_cost)
         if solutions:
-            solutions.sort(key=lambda x: x[1] + x[2])
+            #solutions.sort(key=lambda x: x[1] + x[2])
             #print(len(solutions))
             #print(phase, depth)
             for solution_candidate, cost, corner_cost in solutions:
@@ -104,7 +104,7 @@ def solver_p(phase, state, pre_solution, pre_cost, max_cost, corner_cost):
 
 def solver(state):
     cost = 0
-    max_cost = 75
+    max_cost = 84
     all_solution = []
     states = [[0, distance(0, state)[1], state, []]]
     n_states = []
@@ -135,6 +135,7 @@ with open('corner_cost.csv', mode='r') as f:
 
 print('initialize done')
 
+'''
 from time import time
 
 from random import randint
@@ -160,7 +161,6 @@ print('avg', sum(tims) / cnt, 'sec', 'max', max(tims), 'sec')
 print('avg', sum(lens) / cnt, 'moves', 'max', max(lens), 'moves')
 print('avg', sum(costs) / cnt, 'cost', 'max', max(costs), 'cost')
 print('longest time scramble', scrambles[tims.index(max(tims))])
-'''
 
 strt = time()
 tmp = solver([9, 5, 4, 4, 4, 11, 4, 11, 3, 2, 0, 11, 6, 2])
