@@ -33,26 +33,24 @@ def distance(phase, state):
     elif phase == 2:
         return corner_cost[corner_idx]
 
-def search(phase, depth, state, banned_pins, cost):
+def search(phase, depth, state, num_pin, strt_pin, cost):
     global solution
     solved_solution = []
     dis = distance(phase, state)
-    if dis == 0:
-        return [[[], 0]]
     direction = int(bool(phase))
-    pins_candidate = [[0, 1, 2, 3], [1, 2], [3, 4]]
-    for num_of_pins in pins_candidate[phase]: # pins that are pulled
-        for pins_up in combs[num_of_pins]:
-            pins = [True if i in pins_up else False for i in range(4)]
-            if pins in banned_pins[direction]:
-                continue
-            twist_candidate = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-            n_banned_pins = [[i for i in j] for j in banned_pins]
-            n_banned_pins[direction].append(pins)
-            for twist in twist_candidate:
+    pins_candidate = [[0, 1, 2, 3], [1, 2], [2, 3, 4]]
+    for twist in range(1, 12):
+        twist_proc = twist if twist <= 6 else 12 - twist
+        n_depth = depth - grip_cost - twist_proc
+        for idx_num_pins, num_of_pins in enumerate(pins_candidate[phase][num_pin:]): # pins that are pulled
+            n_num_pin = idx_num_pins
+            cmbs_proc = combs[num_of_pins][strt_pin:] if idx_num_pins == num_pin else combs[num_of_pins]
+            for idx_pins_up, pins_up in enumerate(cmbs_proc):
+                pins = [True if i in pins_up else False for i in range(4)]
+                if phase == 2 and num_of_pins == 2 and not pins in [[True, False, True, False], [False, True, True, False]]:
+                    continue
+                n_strt_pin = idx_pins_up + 1
                 n_state = move(state, pins, direction, twist)
-                twist_proc = twist if twist <= 6 else 12 - twist
-                n_depth = depth - grip_cost - twist_proc
                 n_dis = distance(phase, n_state)
                 n_cost = cost + grip_cost + twist_proc
                 if n_dis > dis:
@@ -61,21 +59,24 @@ def search(phase, depth, state, banned_pins, cost):
                 if n_dis == 0:
                     solved_solution.append([deepcopy(solution), n_cost])
                 elif n_dis <= n_depth:
-                    tmp = search(phase, n_depth, n_state, n_banned_pins, n_cost)
+                    tmp = search(phase, n_depth, n_state, n_num_pin, n_strt_pin, n_cost)
                     if len(tmp):
                         solved_solution.extend(tmp)
-                if len(solved_solution) >= 1:
+                if len(solved_solution) >= 2:
                     return solved_solution
                 solution.pop()
     return solved_solution
 
 def solver_p(phase, state, pre_solution, pre_cost):
     global solution
+    if distance(phase, state) == 0:
+        return [pre_cost, state, pre_solution]
     admissible_depth = 0
     res = []
-    for depth in range(50):
+    for depth in range(40):
         solution = deepcopy(pre_solution)
-        phase_solutions = search(phase, depth + admissible_depth, state, [[], []], pre_cost)
+        #print(phase, depth)
+        phase_solutions = search(phase, depth + admissible_depth, state, 0, 0, pre_cost)
         if len(phase_solutions):
             for phase_solution, cost in phase_solutions:
                 n_state = [i for i in state]
@@ -110,15 +111,16 @@ with open('upper_cost.csv', mode='r') as f:
 with open('corner_cost.csv', mode='r') as f:
     corner_cost = [int(i) for i in f.readline().replace('\n', '').split(',')]
 
-'''
+
 from time import time
 from random import randint
 tims = []
 lens = []
 costs = []
+scrambles = []
 cnt = 0
 num = 100
-for _ in range(num):
+for i in range(num):
     strt = time()
     test_cube = [randint(0, 11) for _ in range(14)]
     res, cost = solver(test_cube)
@@ -129,15 +131,18 @@ for _ in range(num):
         tims.append(tim)
         lens.append(len(res))
         costs.append(cost)
+        scrambles.append(test_cube)
         cnt += 1
 print(cnt, '/', num)
 print('avg', sum(tims) / cnt, 'sec', 'max', max(tims), 'sec')
 print('avg', sum(lens) / cnt, 'moves', 'max', max(lens), 'moves')
 print('avg', sum(costs) / cnt, 'cost', 'max', max(costs), 'cost')
+print(scrambles[tims.index(max(tims))])
 
-
+'''
 strt = time()
-tmp = solver([5, 11, 6, 1, 4, 3, 5, 7, 1, 10, 5, 6, 11, 9])
+tmp = solver([2, 11, 7, 11, 6, 6, 11, 8, 9, 2, 3, 1, 3, 6])
+#tmp = solver([5, 11, 6, 1, 4, 3, 5, 7, 1, 10, 5, 6, 11, 9])
 print(len(tmp[0]), tmp[0], tmp[1], time() - strt) # UR3- DR5- DL0+ UL3- U3+ R3- D1+ L2- ALL6+ y2 U3- R3+ D5+ L1+ ALL2- DR DL UL
 #print(solver([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0]))
 #print(solver([9, 3, 3, 0, 3, 3, 9, 0, 9, 3, 3, 3, 3, 3]))
