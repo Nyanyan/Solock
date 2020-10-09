@@ -65,9 +65,11 @@ def create_corner_cost():
     cnt = 0
     while que:
         state, cost = que.popleft()
-        for num_of_pins in [3, 4]:
+        for num_of_pins in [2, 3, 4]:
             for pins_up in combs[num_of_pins]:
                 pins = [True if i in pins_up else False for i in range(4)]
+                if num_of_pins == 2 and not pins in [[True, False, True, False], [False, True, True, False]]:
+                    continue
                 for twist in range(1, 12):
                     n_state = move(state, pins, 1, twist)
                     n_idx = state2idx(n_state)[2]
