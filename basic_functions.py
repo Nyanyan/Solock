@@ -42,6 +42,8 @@ def state2idx(state):
     for i in range(4):
         res_corner *= 12
         res_corner += state_corner[i]
+    res_corner *= 12
+    res_corner += state[1]
     return res_lower, res_upper, res_corner
 
 def idx2state(idx_lower, idx_upper, idx_corner):
@@ -52,6 +54,7 @@ def idx2state(idx_lower, idx_upper, idx_corner):
     for i in [9, 10, 11, 12, 13]:
         res[i] = idx_lower % 12
         idx_lower //= 12
+    res_corner //= 12
     for i in [0, 2, 6, 8]:
         res[i] = idx_corner % 12
         idx_corner //= 12
