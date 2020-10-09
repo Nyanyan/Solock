@@ -63,15 +63,17 @@ def search(phase, depth, state, strt_idx, cost):
                     tmp = search(phase, n_depth, n_state, n_strt_idx, n_cost)
                     if tmp:
                         solved_solution.extend(tmp)
-                if len(solved_solution) > 10: # to make it faster
+                '''
+                if len(solved_solution) > 1: # to make it faster
                     return solved_solution
+                '''
             solution.pop()
     return solved_solution
 
 def solver_p(phase, state, pre_solution, pre_cost, max_cost, corner_cost):
     global solution
-    if distance(phase, state) == 0:
-        return [[pre_cost, state, pre_solution]]
+    if distance(phase, state)[0] == 0:
+        return [[pre_cost, corner_cost, state, pre_solution]]
     strt = len(pre_solution)
     res = []
     depth_lst = [corner_cost] if phase == 2 else range(1, max_cost - pre_cost - corner_cost)
@@ -83,10 +85,14 @@ def solver_p(phase, state, pre_solution, pre_cost, max_cost, corner_cost):
             #solutions.sort(key=lambda x: x[1] + x[2])
             #print(len(solutions))
             #print(phase, depth)
+            states = []
             for solution_candidate, cost, corner_cost in solutions:
                 n_state = [i for i in state]
                 for pins, direction, twist in solution_candidate[strt:]:
                     n_state = move(n_state, pins, direction, twist)
+                if n_state in states:
+                    continue
+                states.append(n_state)
                 res.append([cost, corner_cost, n_state, solution_candidate])
             break
     #print(phase, len(res))
@@ -134,6 +140,8 @@ num = 100 #100000
 for i in range(num):
     strt = time()
     test_cube = [randint(0, 11) for _ in range(14)]
+    with open('log.txt', mode='a') as f:
+        f.write(str(test_cube) + '\n')
     res, cost = solver(test_cube)
     tim = time() - strt
     print(i, len(res), 'moves', cost, 'cost', tim, 'sec')
@@ -149,7 +157,7 @@ print('avg', sum(costs) / cnt, 'cost', 'max', max(costs), 'cost')
 print('longest time scramble', scrambles[tims.index(max(tims))])
 '''
 strt = time()
-#tmp = solver([6, 5, 6, 7, 0, 7, 1, 5, 10, 8, 1, 7, 10, 8])
+tmp = solver([6, 3, 1, 3, 3, 3, 7, 3, 6, 6, 8, 1, 9, 2])
 #tmp = solver([5, 11, 6, 1, 4, 3, 5, 7, 1, 10, 5, 6, 11, 9]) # UR3- DR5- DL0+ UL3- U3+ R3- D1+ L2- ALL6+ y2 U3- R3+ D5+ L1+ ALL2- DR DL UL
 print(len(tmp[0]), tmp[0], tmp[1], time() - strt)
 #print(solver([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0]))
