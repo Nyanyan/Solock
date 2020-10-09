@@ -104,7 +104,7 @@ def solver_p(phase, state, pre_solution, pre_cost, max_cost, corner_cost):
 
 def solver(state):
     cost = 0
-    max_cost = 72
+    max_cost = 75
     all_solution = []
     states = [[0, distance(0, state)[1], state, []]]
     n_states = []
@@ -118,8 +118,6 @@ def solver(state):
             n_states.sort(key=lambda x: x[0] + x[1])
             states = [deepcopy(n_states[0])]
             n_states = []
-    if n_states == []:
-        return -1, -1
     chosen_solution = n_states[0][3]
     chosen_cost = n_states[0][0]
     return chosen_solution, chosen_cost
@@ -145,21 +143,18 @@ lens = []
 costs = []
 scrambles = []
 cnt = 0
-num = 100
+num = 1000
 for i in range(num):
     strt = time()
     test_cube = [randint(0, 11) for _ in range(14)]
     res, cost = solver(test_cube)
-    if res != -1:
-        tim = time() - strt
-        print(i, len(res), 'moves', cost, 'cost', tim, 'sec')
-        tims.append(tim)
-        lens.append(len(res))
-        costs.append(cost)
-        scrambles.append(test_cube)
-        cnt += 1
-    else:
-        print(-1)
+    tim = time() - strt
+    print(i, len(res), 'moves', cost, 'cost', tim, 'sec')
+    tims.append(tim)
+    lens.append(len(res))
+    costs.append(cost)
+    scrambles.append(test_cube)
+    cnt += 1
 print(cnt, '/', num)
 print('avg', sum(tims) / cnt, 'sec', 'max', max(tims), 'sec')
 print('avg', sum(lens) / cnt, 'moves', 'max', max(lens), 'moves')
