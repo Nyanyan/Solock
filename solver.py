@@ -110,8 +110,8 @@ with open('upper_cost.csv', mode='r') as f:
 with open('corner_cost.csv', mode='r') as f:
     corner_cost = [int(i) for i in f.readline().replace('\n', '').split(',')]
 
+'''
 from time import time
-
 from random import randint
 tims = []
 lens = []
@@ -134,7 +134,7 @@ print(cnt, '/', num)
 print('avg', sum(tims) / cnt, 'sec', 'max', max(tims), 'sec')
 print('avg', sum(lens) / cnt, 'moves', 'max', max(lens), 'moves')
 print('avg', sum(costs) / cnt, 'cost', 'max', max(costs), 'cost')
-'''
+
 
 strt = time()
 tmp = solver([5, 11, 6, 1, 4, 3, 5, 7, 1, 10, 5, 6, 11, 9])

@@ -64,8 +64,9 @@ def inspection_p():
         inspection_upper.place_forget()
         inspection_finish.place_forget()
         create_clock(state)
-        solution = solver(state)
+        solution, cost = solver(state)
         print(state)
+        print(cost)
         #print(solution)
         with open('log.txt', mode='w') as f:
             f.write(str(state) + '\n')
