@@ -51,11 +51,11 @@ def search(phase, depth, state, strt_idx, cost):
             solution.append([pins, direction, twist])
             if phase == 2:
                 if n_depth == 0 and n_dis == 0 and (solved_solution == [] or n_cost < solved_solution[0][1]):
-                    solved_solution = [[deepcopy(solution), n_cost, 0]]
+                    return [[deepcopy(solution), n_cost, 0]]
                 elif n_dis <= n_depth:
                     tmp = search(phase, n_depth, n_state, n_strt_idx, n_cost)
                     if tmp and (solved_solution == [] or tmp[0][1] < solved_solution[0][1]):
-                        solved_solution = tmp
+                        return tmp
             else:
                 if n_depth <= 0 and n_dis == 0:
                     solved_solution.append([deepcopy(solution), n_cost, n_corner_dis])
@@ -63,10 +63,6 @@ def search(phase, depth, state, strt_idx, cost):
                     tmp = search(phase, n_depth, n_state, n_strt_idx, n_cost)
                     if tmp:
                         solved_solution.extend(tmp)
-                '''
-                if len(solved_solution) > 1: # to make it faster
-                    return solved_solution
-                '''
             solution.pop()
     return solved_solution
 
@@ -136,7 +132,7 @@ lens = []
 costs = []
 scrambles = []
 cnt = 0
-num = 100 #100000
+num = 1000 #100000
 for i in range(num):
     strt = time()
     test_cube = [randint(0, 11) for _ in range(14)]
@@ -157,7 +153,8 @@ print('avg', sum(costs) / cnt, 'cost', 'max', max(costs), 'cost')
 print('longest time scramble', scrambles[tims.index(max(tims))])
 '''
 strt = time()
-tmp = solver([6, 3, 1, 3, 3, 3, 7, 3, 6, 6, 8, 1, 9, 2])
+#tmp = solver([6, 3, 1, 3, 3, 3, 7, 3, 6, 6, 8, 1, 9, 2]) # skip
+tmp = solver([6, 7, 10, 9, 1, 4, 5, 1, 7, 2, 1, 2, 2, 10])
 #tmp = solver([5, 11, 6, 1, 4, 3, 5, 7, 1, 10, 5, 6, 11, 9]) # UR3- DR5- DL0+ UL3- U3+ R3- D1+ L2- ALL6+ y2 U3- R3+ D5+ L1+ ALL2- DR DL UL
 print(len(tmp[0]), tmp[0], tmp[1], time() - strt)
 #print(solver([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0]))
