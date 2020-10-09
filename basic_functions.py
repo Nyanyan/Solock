@@ -1,5 +1,4 @@
 # coding:utf-8
-from itertools import combinations
 
 def move_clocks_p(pins, direction):
     res = []
@@ -44,6 +43,8 @@ def state2idx(state):
         res_corner += state_corner[i]
     res_corner *= 12
     res_corner += state[1]
+    res_corner *= 12
+    res_corner += state[9]
     return res_lower, res_upper, res_corner
 
 def idx2state(idx_lower, idx_upper, idx_corner):
@@ -54,7 +55,7 @@ def idx2state(idx_lower, idx_upper, idx_corner):
     for i in [9, 10, 11, 12, 13]:
         res[i] = idx_lower % 12
         idx_lower //= 12
-    res_corner //= 12
+    res_corner //= 12 ** 2
     for i in [0, 2, 6, 8]:
         res[i] = idx_corner % 12
         idx_corner //= 12
@@ -62,6 +63,35 @@ def idx2state(idx_lower, idx_upper, idx_corner):
 
 grip_cost = 3
 
+pins_candidate = [
+    [[[True, True, False, False], 0], [[True, False, True, False], 0], [[False, True, False, True], 0], [[False, False, True, True], 0], [[True, True, True, False], 0], [[True, True, False, True], 0], [[True, False, True, True], 0], [[False, True, True, True], 0]],
+    [[[True, False, False, False], 1], [[False, True, False, False], 1], [[False, False, True, False], 1], [[False, False, False, True], 1], [[True, True, False, False], 1], [[True, False, True, False], 1], [[False, True, False, True], 1], [[False, False, True, True], 1]],
+    [
+        [[False, False, False, False], 0], [[True, False, False, False], 0], [[False, True, False, False], 0], [[False, False, True, False], 0], [[False, False, False, True], 0], [[True, False, False, True], 0], [[False, True, True, False], 0],
+        [[True, False, False, True], 1], [[False, True, True, False], 0], [[True, True, True, False], 1], [[True, True, False, True], 1], [[True, False, True, True], 1], [[False, True, True, True], 1], [[True, True, True, True], 1]
+    ]
+    ]
+'''
+direction = [0, 1, 0]
+for phase in range(3):
+    for i in range(len(pins_candidate[phase])):
+        pins_candidate[phase][i] = [pins_candidate[phase][i], direction[phase]]
+for i in range(3):
+    print(pins_candidate[i])
+'''
+'''
+from itertools import combinations
 combs = []
 for i in range(5):
     combs.append([j for j in combinations(range(4), i)])
+
+pins_up_candidate = [[2, 3], [1, 2], [0, 1, 2, 3, 4]]
+pins_candidate = []
+for phase in range(3):
+    pins_candidate.append([])
+    for num_of_pins in pins_up_candidate[phase]:
+        for pins_up in combs[num_of_pins]:
+            pins_candidate[phase].append([True if i in pins_up else False for i in range(4)])
+for i in range(3):
+    print(pins_candidate[i])
+'''
