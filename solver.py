@@ -68,7 +68,7 @@ def search(phase, depth, state, strt_idx, cost):
                     if tmp:
                         return tmp
             else:
-                if n_depth <= 0 and n_dis == 0:
+                if n_dis == 0:
                     solved_solution.append([[[i for i in j] for j in solution], n_cost, n_next_dis])
                 elif n_dis <= n_depth:
                     tmp = search(phase, n_depth, n_state, n_strt_idx, n_cost)
@@ -85,6 +85,7 @@ def solver_p(phase, state, pre_solution, pre_cost):
     strt = len(pre_solution)
     res = []
     max_cost = 106
+    #print(state)
     for depth in range(1, max_cost):
         solution = [[i for i in j] for j in pre_solution]
         #print(phase, depth)
@@ -149,7 +150,7 @@ lens = []
 costs = []
 scrambles = []
 cnt = 0
-num = 100 #100000
+num = 1000 #100000
 for i in range(num):
     strt = time()
     test_cube = [randint(0, 11) for _ in range(14)]
@@ -170,7 +171,8 @@ print('avg', sum(costs) / cnt, 'cost', 'max', max(costs), 'cost')
 print('longest time scramble', scrambles[tims.index(max(tims))])
 '''
 strt = time()
-tmp = solver([8, 2, 2, 8, 6, 4, 2, 9, 2, 6, 10, 5, 0, 4])
+tmp = solver([11, 10, 6, 4, 4, 2, 11, 2, 3, 3, 7, 6, 7, 4])
+#tmp = solver([8, 2, 2, 8, 6, 4, 2, 9, 2, 6, 10, 5, 0, 4])
 #tmp = solver([10, 2, 8, 4, 8, 1, 2, 2, 7, 3, 9, 1, 10, 3])
 #tmp = solver([0, 2, 3, 1, 6, 1, 8, 11, 5, 10, 1, 3, 11, 0])
 #tmp = solver([11, 9, 7, 1, 3, 4, 7, 8, 5, 1, 3, 0, 9, 5])
