@@ -61,7 +61,7 @@ def search(phase, depth, state, strt_idx, cost):
                 continue
             solution.append([pin_num, twist])
             if phase == 2:
-                if n_depth == 0 and n_dis == 0:
+                if n_dis == 0:
                     return [[[[i for i in j] for j in solution], n_cost, 0]]
                 elif n_dis <= n_depth:
                     tmp = search(phase, n_depth, n_state, n_strt_idx, n_cost)
@@ -87,7 +87,7 @@ def solver_p(phase, state, pre_solution, pre_cost):
     max_cost = 106
     for depth in range(1, max_cost):
         solution = [[i for i in j] for j in pre_solution]
-        print(phase, depth)
+        #print(phase, depth)
         solutions = search(phase, depth, state, 0, pre_cost)
         if solutions:
             #solutions.sort(key=lambda x: x[1] + x[2])
@@ -142,7 +142,7 @@ print('initialized')
 
 
 from time import time
-'''
+
 from random import randint
 tims = []
 lens = []
@@ -182,3 +182,4 @@ tmp = solver([8, 2, 2, 8, 6, 4, 2, 9, 2, 6, 10, 5, 0, 4])
 print(len(tmp[0]), tmp[0], tmp[1], time() - strt)
 #print(solver([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0]))
 #print(solver([9, 3, 3, 0, 3, 3, 9, 0, 9, 3, 3, 3, 3, 3]))
+'''
