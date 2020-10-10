@@ -139,9 +139,9 @@ with open('cross_cost.csv', mode='r') as f:
 with open('corner_cost.csv', mode='r') as f:
     corner_cost = [int(i) for i in f.readline().replace('\n', '').split(',')]
 
-print('initialized')
+print('solver initialized')
 
-
+'''
 from time import time
 
 from random import randint
@@ -169,7 +169,7 @@ print('avg', sum(tims) / cnt, 'sec', 'max', max(tims), 'sec')
 print('avg', sum(lens) / cnt, 'moves', 'max', max(lens), 'moves')
 print('avg', sum(costs) / cnt, 'cost', 'max', max(costs), 'cost')
 print('longest time scramble', scrambles[tims.index(max(tims))])
-'''
+
 strt = time()
 tmp = solver([11, 10, 6, 4, 4, 2, 11, 2, 3, 3, 7, 6, 7, 4])
 #tmp = solver([8, 2, 2, 8, 6, 4, 2, 9, 2, 6, 10, 5, 0, 4])

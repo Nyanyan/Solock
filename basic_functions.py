@@ -75,6 +75,8 @@ pins_candidate = [
 pins_num_candidate = [[10, 12, 18, 20, 22, 24, 26, 28], [3, 5, 7, 9, 11, 13, 19, 21], [0, 2, 4, 6, 8, 14, 16, 15, 16, 23, 25, 27, 29, 31]]
 set_pins_num_candidate = [set(i) for i in pins_num_candidate]
 
+print('basic functions initialized')
+
 '''
 pins_candidate_phase = [
     [[[True, True, False, False], 0], [[True, False, True, False], 0], [[False, True, False, True], 0], [[False, False, True, True], 0], [[True, True, True, False], 0], [[True, True, False, True], 0], [[True, False, True, True], 0], [[False, True, True, True], 0]],

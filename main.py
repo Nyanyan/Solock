@@ -101,4 +101,6 @@ solvingtime.place(x=120, y=20)
 
 create_clock()
 
+print('main initialized')
+
 root.mainloop()

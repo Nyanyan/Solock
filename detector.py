@@ -66,4 +66,6 @@ def detector(direction):
     else:
         return clocks
 
+print('detector initialized')
+
 #print(detector(1))
