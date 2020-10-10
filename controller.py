@@ -16,7 +16,10 @@ def send_command(num, arg1, arg2=None, arg3=None):
 
 def controller(solution, rpm, slp_tim, ratio):
     strt_solv = time()
-    for pins, direction, twist in solution:
+    idx = 0
+    len_solution = len(solution)
+    while idx < len_solution:
+        pins, direction, twist = solution[idx]
         #print(pins, direction, twist)
         send_command(0, pins)
         sleep(slp_tim)
@@ -25,8 +28,19 @@ def controller(solution, rpm, slp_tim, ratio):
         if twist_fixed > 180:
             twist_fixed = twist_fixed - 360
         send_command(1, twist_fixed, rpm, move_motors)
-        slp_tim_motor = 2 * 60 / rpm * abs(twist_fixed) / 360 * ratio
+        max_twist = abs(twist_fixed)
+        if idx + 1 < len_solution and solution[idx + 1][0] == pins:
+            n_pins, n_direction, n_twist = solution[idx + 1]
+            n_move_motors = [int(i) == n_direction for i in n_pins]
+            n_twist_fixed = n_twist * 30
+            if n_twist_fixed > 180:
+                n_twist_fixed = n_twist_fixed - 360
+            send_command(1, n_twist_fixed, rpm, n_move_motors)
+            max_twist = max(max_twist, abs(n_twist_fixed))
+            idx += 1
+        slp_tim_motor = 2 * 60 / rpm * max_twist / 360 * ratio
         sleep(slp_tim_motor)
+        idx += 1
     solv_time = str(int((time() - strt_solv) * 1000) / 1000).ljust(5, '0')
     return solv_time
 
