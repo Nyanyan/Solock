@@ -43,9 +43,9 @@ def create_cross_cost():
         if cnt % 1000 == 0:
             print(cnt, len(que))
         state, cost = que.popleft()
-        for pins, direction in pins_candidate[phase]:
+        for pin_num in pins_num_candidate[phase]:
             for twist in range(1, 12):
-                n_state = move(state, pins, direction, twist)
+                n_state = move(state, pin_num, twist)
                 n_idx = state2idx(n_state)[phase]
                 n_cost = cost + grip_cost + min(twist, abs(12 - twist))
                 if cross_cost[n_idx] > n_cost:
@@ -67,9 +67,9 @@ def create_corner_cost():
         if cnt % 1000 == 0:
             print(cnt, len(que))
         state, cost = que.popleft()
-        for pins, direction in pins_candidate[phase]:
+        for pin_num in pins_num_candidate[phase]:
             for twist in range(1, 12):
-                n_state = move(state, pins, direction, twist)
+                n_state = move(state, pin_num, twist)
                 n_idx = state2idx(n_state)[phase]
                 n_cost = cost + grip_cost + min(twist, abs(12 - twist))
                 if corner_cost[n_idx] > n_cost:
@@ -80,4 +80,4 @@ def create_corner_cost():
         writer.writerow(corner_cost)
 
 #create_cross_cost()
-create_corner_cost()
+#create_corner_cost()
