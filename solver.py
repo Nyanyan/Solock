@@ -91,24 +91,18 @@ def search(phase, depth, state, strt_idx, cost):
             if n_dis >= dis:
                 continue
             solution.append([pin_num, twist])
-            '''
-            if n_depth == 0 and n_dis > 0: # Although the depth is 0, if you turn both layers (and the amount of twist is small), the cost does not increase
-                nn_dis, nn_next_dis = depth_0_search(phase, n_state)
-                if nn_dis == 0:
-                    n_dis = nn_dis
-                    n_next_dis = nn_next_dis
-            '''
+            n_depth_proc = n_depth + grip_cost + 6 if n_depth == 0 else n_depth # Although the depth is 0, if you turn both layers (and the amount of twist is small), the cost does not increase
             if phase == 2:
                 if n_dis == 0:
                     return [[[[i for i in j] for j in solution], n_cost, 0]]
-                elif n_dis <= n_depth + 9:
+                elif n_dis <= n_depth_proc:
                     tmp = search(phase, n_depth, n_state, n_strt_idx, n_cost)
                     if tmp:
                         return tmp
             else:
                 if n_dis == 0:
                     solved_solution.append([[[i for i in j] for j in solution], n_cost, n_next_dis])
-                elif n_dis <= n_depth + 9:
+                elif n_dis <= n_depth_proc:
                     tmp = search(phase, n_depth, n_state, n_strt_idx, n_cost)
                     if tmp:
                         solved_solution.extend(tmp)
