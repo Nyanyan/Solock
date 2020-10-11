@@ -61,7 +61,7 @@ def depth_0_search(phase, state):
     return n_dis, n_next_dis
 '''
 
-def search(phase, depth, state, strt_idx, cost):
+def search(phase, depth, state, strt_idx, solution_strt):
     global solution
     solved_solution = []
     dis, _ = distance(phase, state)
@@ -72,38 +72,36 @@ def search(phase, depth, state, strt_idx, cost):
         former_twist = 0
         if n_pin_num in set_solution: # to find faster solution: search the solution in which the robot twist the both layer
             former_twist = solution[pins_solution.index(n_pin_num)][1]
-            n_cost_base = cost - former_twist
             n_depth_base = depth + former_twist
         else:
-            n_cost_base = cost + grip_cost
             n_depth_base = depth - grip_cost
         if n_depth_base < 0:
             continue
         n_strt_idx = strt_idx + idx + 1
         for twist in range(1, 12):
             twist_proc = min(twist, abs(12 - twist))
-            n_cost = n_cost_base + max(former_twist, twist_proc)
             n_depth = n_depth_base - max(former_twist, twist_proc)
             if n_depth < 0:
                 continue
             n_state = move(state, pin_num, twist)
             n_dis, n_next_dis = distance(phase, n_state)
-            if n_dis >= dis:
+            if n_dis + depth > dis + n_depth:
                 continue
             solution.append([pin_num, twist])
-            n_depth_proc = n_depth + grip_cost + 6 if n_depth == 0 else n_depth # Although the depth is 0, if you turn both layers (and the amount of twist is small), the cost does not increase
             if phase == 2:
                 if n_dis == 0:
-                    return [[[[i for i in j] for j in solution], n_cost, 0]]
-                elif n_dis <= n_depth_proc:
-                    tmp = search(phase, n_depth, n_state, n_strt_idx, n_cost)
+                    return [[[[i for i in j] for j in solution], 0]]
+                #if n_depth == 0 else n_depth # Although the depth is 0, if you turn both layers (and the amount of twist is small), the cost does not increase
+                if n_dis <= n_depth + len(solution[solution_strt:]) * grip_cost + sum([max(i[1], abs(12 - i[1])) for i in solution[solution_strt:]]):
+                    tmp = search(phase, n_depth, n_state, n_strt_idx, solution_strt)
                     if tmp:
                         return tmp
             else:
                 if n_dis == 0:
-                    solved_solution.append([[[i for i in j] for j in solution], n_cost, n_next_dis])
-                elif n_dis <= n_depth_proc:
-                    tmp = search(phase, n_depth, n_state, n_strt_idx, n_cost)
+                    solved_solution.append([[[i for i in j] for j in solution], n_next_dis])
+                #if n_depth == 0 else n_depth # Although the depth is 0, if you turn both layers (and the amount of twist is small), the cost does not increase
+                if n_dis <= n_depth + len(solution[solution_strt:]) * grip_cost + sum([max(i[1], abs(12 - i[1])) for i in solution[solution_strt:]]):
+                    tmp = search(phase, n_depth, n_state, n_strt_idx, solution_strt)
                     if tmp:
                         solved_solution.extend(tmp)
             solution.pop()
@@ -112,31 +110,24 @@ def search(phase, depth, state, strt_idx, cost):
 def solver_p(phase, state, pre_solution, pre_cost):
     global solution
     dis, n_dis = distance(phase, state)
-    if dis == 0:
-        return [[pre_cost, n_dis, state, pre_solution]]
     strt = len(pre_solution)
     res = []
-    max_cost = 106
     #print(state)
-    for depth in range(1, max_cost):
+    for depth in range(dis + 1):
         solution = [[i for i in j] for j in pre_solution]
         #print(phase, depth)
-        solutions = search(phase, depth, state, 0, pre_cost)
+        solutions = search(phase, depth, state, 0, len(solution))
         if solutions:
             #solutions.sort(key=lambda x: x[1] + x[2])
             #print(len(solutions))
             #print(phase, depth)
             states = []
-            for solution_candidate, cost, n_next_cost in solutions:
+            for solution_candidate, n_next_cost in solutions:
                 n_state = [i for i in state]
                 for pin_num, twist in solution_candidate[strt:]:
                     n_state = move(n_state, pin_num, twist)
-                '''
-                if n_state in states:
-                    continue
-                '''
                 states.append(n_state)
-                res.append([cost, n_next_cost, n_state, solution_candidate])
+                res.append([pre_cost + depth, n_next_cost, n_state, solution_candidate])
             break
     #print('done', phase, len(res))
     #print(res[0])
@@ -203,7 +194,7 @@ print('avg', sum(costs) / cnt, 'cost', 'max', max(costs), 'cost')
 print('longest time scramble', scrambles[tims.index(max(tims))])
 '''
 strt = time()
-tmp = solver([11, 10, 6, 4, 4, 2, 11, 2, 3, 3, 7, 6, 7, 4])
+#tmp = solver([11, 10, 6, 4, 4, 2, 11, 2, 3, 3, 7, 6, 7, 4])
 #tmp = solver([8, 2, 2, 8, 6, 4, 2, 9, 2, 6, 10, 5, 0, 4])
 #tmp = solver([10, 2, 8, 4, 8, 1, 2, 2, 7, 3, 9, 1, 10, 3])
 #tmp = solver([0, 2, 3, 1, 6, 1, 8, 11, 5, 10, 1, 3, 11, 0])
@@ -213,6 +204,7 @@ tmp = solver([11, 10, 6, 4, 4, 2, 11, 2, 3, 3, 7, 6, 7, 4])
 #tmp = solver([6, 3, 1, 3, 3, 3, 7, 3, 6, 6, 8, 1, 9, 2]) # skip
 #tmp = solver([6, 7, 10, 9, 1, 4, 5, 1, 7, 2, 1, 2, 2, 10])
 #tmp = solver([5, 11, 6, 1, 4, 3, 5, 7, 1, 10, 5, 6, 11, 9]) # UR3- DR5- DL0+ UL3- U3+ R3- D1+ L2- ALL6+ y2 U3- R3+ D5+ L1+ ALL2- DR DL UL
+tmp = solver([6, 3, 10, 2, 3, 5, 8, 5, 9, 4, 4, 6, 7, 6]) # UR6+ DR5+ DL3+ UL1+ U5+ R3+ D6+ L5- ALL6+ y2 U2- R1+ D0+ L2- ALL6+ DR UL
 print(len(tmp[0]), tmp[0], tmp[1], time() - strt)
 #print(solver([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0]))
 #print(solver([9, 3, 3, 0, 3, 3, 9, 0, 9, 3, 3, 3, 3, 3]))
