@@ -33,6 +33,34 @@ def distance(phase, state):
     else:
         return corner_cost[corner_idx], -1
 
+'''
+def depth_0_search(phase, state):
+    global solution
+    n_dis, n_next_dis = distance(phase, state)
+    nn_state = [i for i in state]
+    for f_pin_num, f_twist in solution:
+        nn_pin_num = f_pin_num - 1 if f_pin_num % 2 else f_pin_num + 1
+        if nn_pin_num in set([i[0] for i in solution]) or not nn_pin_num in pins_num_candidate[phase]:
+            continue
+        f_twist_proc = min(f_twist, abs(12 - f_twist))
+        nn_twists = list(range(1, f_twist_proc + 1))
+        nn_twists.extend(list(range(12 - f_twist_proc, 12)))
+        for nn_twist in nn_twists:
+            nn_state = move(nn_state, nn_pin_num, nn_twist)
+            nn_dis, nn_next_dis = distance(phase, nn_state)
+            if nn_dis >= n_dis:
+                continue
+            solution.append([nn_pin_num, nn_twist])
+            if nn_dis == 0:
+                print('bbbbbbbbbb')
+                return nn_dis, nn_next_dis
+            nnn_dis, nnn_next_dis = depth_0_search(phase, nn_state)
+            if nnn_dis == 0:
+                return nnn_dis, nnn_next_dis
+            solution.pop()
+    return n_dis, n_next_dis
+'''
+
 def search(phase, depth, state, strt_idx, cost):
     global solution
     solved_solution = []
@@ -41,36 +69,46 @@ def search(phase, depth, state, strt_idx, cost):
     set_solution = set(pins_solution)
     for idx, pin_num in enumerate(pins_num_candidate[phase][strt_idx:]): # to find normal solution
         n_pin_num = pin_num - 1 if pin_num % 2 else pin_num + 1
-        flag = False
+        former_twist = 0
         if n_pin_num in set_solution: # to find faster solution: search the solution in which the robot twist the both layer
-            flag = True
+            former_twist = solution[pins_solution.index(n_pin_num)][1]
+            n_cost_base = cost - former_twist
+            n_depth_base = depth + former_twist
+        else:
+            n_cost_base = cost + grip_cost
+            n_depth_base = depth - grip_cost
+        if n_depth_base < 0:
+            continue
         n_strt_idx = strt_idx + idx + 1
         for twist in range(1, 12):
             twist_proc = min(twist, abs(12 - twist))
-            if flag:
-                former_twist = solution[pins_solution.index(n_pin_num)][1]
-                max_twist = max(twist, former_twist)
-                n_cost = cost - former_twist + max_twist
-                n_depth = depth + former_twist - max_twist
-            else:
-                n_depth = depth - grip_cost - twist_proc
-                n_cost = cost + grip_cost + twist_proc
+            n_cost = n_cost_base + max(former_twist, twist_proc)
+            n_depth = n_depth_base - max(former_twist, twist_proc)
+            if n_depth < 0:
+                continue
             n_state = move(state, pin_num, twist)
             n_dis, n_next_dis = distance(phase, n_state)
-            if n_dis > dis or n_depth < 0:
+            if n_dis >= dis:
                 continue
             solution.append([pin_num, twist])
+            '''
+            if n_depth == 0 and n_dis > 0: # Although the depth is 0, if you turn both layers (and the amount of twist is small), the cost does not increase
+                nn_dis, nn_next_dis = depth_0_search(phase, n_state)
+                if nn_dis == 0:
+                    n_dis = nn_dis
+                    n_next_dis = nn_next_dis
+            '''
             if phase == 2:
                 if n_dis == 0:
                     return [[[[i for i in j] for j in solution], n_cost, 0]]
-                elif n_dis <= n_depth:
+                elif n_dis <= n_depth + 9:
                     tmp = search(phase, n_depth, n_state, n_strt_idx, n_cost)
                     if tmp:
                         return tmp
             else:
                 if n_dis == 0:
                     solved_solution.append([[[i for i in j] for j in solution], n_cost, n_next_dis])
-                elif n_dis <= n_depth:
+                elif n_dis <= n_depth + 9:
                     tmp = search(phase, n_depth, n_state, n_strt_idx, n_cost)
                     if tmp:
                         solved_solution.extend(tmp)
@@ -141,7 +179,7 @@ with open('corner_cost.csv', mode='r') as f:
 
 print('solver initialized')
 
-'''
+
 from time import time
 
 from random import randint
@@ -150,7 +188,7 @@ lens = []
 costs = []
 scrambles = []
 cnt = 0
-num = 1000 #100000
+num = 100 #100000
 for i in range(num):
     strt = time()
     test_cube = [randint(0, 11) for _ in range(14)]
@@ -169,7 +207,7 @@ print('avg', sum(tims) / cnt, 'sec', 'max', max(tims), 'sec')
 print('avg', sum(lens) / cnt, 'moves', 'max', max(lens), 'moves')
 print('avg', sum(costs) / cnt, 'cost', 'max', max(costs), 'cost')
 print('longest time scramble', scrambles[tims.index(max(tims))])
-
+'''
 strt = time()
 tmp = solver([11, 10, 6, 4, 4, 2, 11, 2, 3, 3, 7, 6, 7, 4])
 #tmp = solver([8, 2, 2, 8, 6, 4, 2, 9, 2, 6, 10, 5, 0, 4])
