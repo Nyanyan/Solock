@@ -79,7 +79,7 @@ def inspection_p():
     inspection_finish.place(x=0, y=75)
 
 def start_medium_p():
-    solvingtimevar.set(controller(solution, 200, 0.15, 1))
+    solvingtimevar.set(controller(solution, 300, 0.12, 0.9)) # 0.85
 
 
 solution = []
