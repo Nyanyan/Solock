@@ -72,7 +72,7 @@ def search(phase, depth, state, strt_idx):
             solution.pop()
     return solved_solution
 
-def addition(twist_addition):
+def separate_twist(twist_addition):
     if not twist_addition:
         return []
     res_now = []
@@ -83,7 +83,7 @@ def addition(twist_addition):
         else:
             break
     n_twist_addition = [i for i in twist_addition[len(res_now):]]
-    return_vals = addition(n_twist_addition)
+    return_vals = separate_twist(n_twist_addition)
     if not return_vals:
         return [[i] for i in res_now]
     res = []
@@ -97,131 +97,91 @@ def addition(twist_addition):
 def solver_p(phase, state, pre_solution, pre_cost):
     global solution, set_solution
     # If you turn both layers (and the amount of twist is small), the cost does not increase much
-    twist_addition = []
-    for pin_num, former_twist in pre_solution:
+    both_layer_twists = []
+    dis_state, _ = distance(phase, state)
+    for pin_num, f_twist in pre_solution:
         pin_rev = pin_num - 1 if pin_num % 2 else pin_num + 1
         if not pin_rev in set_pins_num_candidate[phase]:
             continue
-        former_twist_cost = min(former_twist, abs(former_twist - 12))
-        min_dis, _ = distance(phase, state)
-        tmp_twists = []
-        for n_twist, n_twist_cost in zip(range(1, 12), [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]):
-            n_state = move(state, pin_rev, n_twist)
+        f_cost = min(f_twist, abs(f_twist - 12))
+        min_dis = dis_state
+        additional_twists = []
+        for twist, cost in zip(range(1, 12), [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]):
+            n_state = move(state, pin_rev, twist)
             n_dis, _ = distance(phase, n_state)
             if n_dis <= min_dis:
                 if n_dis < min_dis:
-                    tmp_twists = []
+                    additional_twists = []
                     min_dis = n_dis
-                tmp_twists.append([pin_rev, n_twist, max(0, n_twist_cost - former_twist_cost)])
-        twist_addition.extend(tmp_twists)
+                additional_twists.append([pin_rev, twist, max(f_cost, cost)])
+        both_layer_twists.extend(additional_twists)
     if phase == 2:
-        for pin_num in [14, 16]:
-            min_dis, _ = distance(phase, state)
-            tmp_twists = []
-            flag = True
-            for twist, twist_cost in zip(range(1, 12), [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]):
-                n_state = move(state, pin_num, twist)
-                n_dis, _ = distance(phase, n_state)
-                if n_dis <= min_dis:
-                    flag = False
-                    if n_dis < min_dis:
-                        tmp_twists = []
-                        min_dis = n_dis
-                    tmp_twists.append([pin_num, twist, grip_cost + twist_cost])
-            twist_addition.extend(tmp_twists)
-            tmp_twists = []
-            pin_rev = pin_num + 1
-            min_dis_twist = -1
-            min_dis_cost = -1
-            min_dis, _ = distance(phase, state)
-            for twist, twist_cost in zip(range(1, 12), [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]):
-                n_state = move(state, pin_rev, twist)
-                n_dis, _ = distance(phase, n_state)
-                if n_dis < min_dis:
-                    if n_dis < min_dis:
-                        tmp_twists = []
-                        min_dis = n_dis
-                    if flag:
-                        tmp_twists.append([pin_rev, twist, grip_cost + twist_cost])
-                    else:
-                        tmp_twists.append([pin_rev, twist, -1])
-            twist_addition.extend(tmp_twists)
-    if twist_addition:
-        twist_addition.sort()
-        additional_twists = addition(twist_addition)
-        print(phase, 'for', twist_addition)
-        print(phase, 'len', len(additional_twists))
-        #print(phase, 'add', additional_twists)
-        former_state = [i for i in state]
-        former_pre_solution = [[j for j in i] for i in pre_solution]
-        for tmp in additional_twists:
-            print(tmp)
-            additional_twist = [i[:2] for i in tmp]
-            costs = [i[2] for i in tmp]
-            for idx, val in enumerate(costs):
-                if val == -1:
-                    cost1 = min(additional_twist[idx + 1][1], abs(additional_twist[idx + 1][1] - 12))
-                    cost2 = min(additional_twist[idx][1], abs(additional_twist[idx][1] - 12))
-                    costs[idx] = 0
-                    costs[idx + 1] = grip_cost + min(cost1, cost2)
-            pls_cost = sum(costs)
-            state = [i for i in former_state]
-            for pin_num, twist in additional_twist:
-                state = move(state, pin_num, twist)
-            dis, n_dis = distance(phase, state)
-            pre_solution = [[j for j in i] for i in former_pre_solution]
-            pre_solution.extend(additional_twist)
-            set_solution = set([i[0] for i in pre_solution])
-            pre_cost += pls_cost
-            strt = len(pre_solution)
-            res = []
-            if dis == 0:
-                return [[pre_cost, n_dis, state, pre_solution]]
-            print(phase, dis, state)
-            #print(phase, sorted(pre_solution))
-            for depth in range(dis + 1):
-                solution = [[i for i in j] for j in pre_solution]
-                #print(phase, depth)
-                solutions = search(phase, depth, state, 0)
-                if solutions:
-                    #solutions.sort(key=lambda x: x[1] + x[2])
-                    #print(len(solutions))
-                    #print(phase, depth)
-                    states = []
-                    for solution_candidate, n_next_cost in solutions:
-                        n_state = [i for i in state]
-                        for pin_num, twist in solution_candidate[strt:]:
-                            n_state = move(n_state, pin_num, twist)
-                        states.append(n_state)
-                        res.append([pre_cost + depth, n_next_cost, n_state, solution_candidate])
-                    break
-            if res:
-                return res
-    else:
-        dis, n_dis = distance(phase, state)
-        set_solution = set([i[0] for i in pre_solution])
-        strt = len(pre_solution)
-        res = []
-        if dis == 0:
-            return [[pre_cost, n_dis, state, pre_solution]]
-        #print(phase, sorted(pre_solution))
-        for depth in range(dis + 1):
-            solution = [[i for i in j] for j in pre_solution]
-            #print(phase, depth)
-            solutions = search(phase, depth, state, 0)
-            if solutions:
-                #solutions.sort(key=lambda x: x[1] + x[2])
-                #print(len(solutions))
-                #print(phase, depth)
-                states = []
-                for solution_candidate, n_next_cost in solutions:
-                    n_state = [i for i in state]
-                    for pin_num, twist in solution_candidate[strt:]:
-                        n_state = move(n_state, pin_num, twist)
-                    states.append(n_state)
-                    res.append([pre_cost + depth, n_next_cost, n_state, solution_candidate])
-                break
-        return res
+        for fst_pin_num in [14, 16]:
+            twisted_flag = False
+            for rev in range(2):
+                pin_num = fst_pin_num + rev
+                min_dis = dis_state
+                additional_twists = []
+                for twist, cost in zip(range(1, 12), [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]):
+                    n_state = move(state, pin_num, twist)
+                    n_dis, _ = distance(phase, n_state)
+                    if n_dis <= min_dis:
+                        if n_dis < min_dis:
+                            additional_twists = []
+                            min_dis = n_dis
+                        twist_cost = -1 if twisted_flag else grip_cost + cost
+                        additional_twists.append([pin_num, twist, twist_cost])
+                both_layer_twists.extend(additional_twists)
+    both_layer_twists.sort()
+    additional_twists = separate_twist(both_layer_twists)
+    if additional_twists == []:
+        additional_twists = [[]]
+    res = []
+    for additional_twist in additional_twists:
+        twist_lst = [i[:2] for i in additional_twist]
+        cost_lst = [i[2] for i in additional_twist]
+        for idx, val in enumerate(cost_lst):
+            if val == -1:
+                cost1 = min(twist_lst[idx + 1][1], abs(twist_lst[idx + 1][1] - 12))
+                cost2 = min(twist_lst[idx][1], abs(twist_lst[idx][1] - 12))
+                cost_lst[idx] = 0
+                cost_lst[idx + 1] = grip_cost + min(cost1, cost2)
+        pls_cost = sum(cost_lst)
+        twisted_cost = pre_cost + pls_cost
+        n_state = [i for i in state]
+        for pin_num, twist in twist_lst:
+            n_state = move(n_state, pin_num, twist)
+        solution = [[i for i in j] for j in pre_solution]
+        solution.extend(twist_lst)
+        strt = len(solution)
+        set_solution = set(i[0] for i in solution)
+        depth, nn_cost = distance(phase, n_state)
+        if depth == 0:
+            res.append([twisted_cost, nn_cost, n_state, [[i for i in j] for j in solution]])
+        searched_solutions = search(phase, depth, n_state, 0)
+        if searched_solutions:
+            for solution_candidate, n_cost in searched_solutions:
+                nn_state = [i for i in n_state]
+                for pin_num, twist in solution_candidate[strt:]:
+                    nn_state = move(nn_state, pin_num, twist)
+                res.append([twisted_cost + depth, n_cost, nn_state, solution_candidate])
+    return res
+
+def calculate_cost(sol):
+    sol = [[i[0] // 2, i[1]] for i in sol]
+    former_twist = 0
+    former_pin = -1
+    res = 0
+    for pin, twist in sol:
+        if pin == former_pin:
+            former_twist = max(former_twist, min(twist, abs(twist - 12)))
+            res += former_twist
+        else:
+            res += grip_cost
+            former_twist = min(twist, abs(twist - 12))
+            res += former_twist
+            former_pin = pin
+    return res
 
 def solver(state):
     global set_solution
@@ -244,6 +204,7 @@ def solver(state):
     #print(chosen_solution)
     chosen_solution.sort()
     print('chosen', chosen_solution)
+    print(calculate_cost(chosen_solution))
     chosen_solution_symbol = [[pins_candidate[i[0]][0], pins_candidate[i[0]][1], i[1]] for i in chosen_solution]
     return chosen_solution_symbol, chosen_cost
 
@@ -287,7 +248,7 @@ print('avg', sum(costs) / cnt, 'cost', 'max', max(costs), 'cost')
 print('longest time scramble', scrambles[tims.index(max(tims))])
 '''
 strt = time()
-tmp = solver([7, 10, 2, 1, 1, 5, 5, 4, 4, 5, 11, 8, 11, 5])
+#tmp = solver([7, 10, 2, 1, 1, 5, 5, 4, 4, 5, 11, 8, 11, 5])
 #tmp = solver([9, 9, 1, 8, 10, 11, 0, 11, 10, 7, 6, 4, 1, 8])
 #tmp = solver([3, 10, 8, 0, 0, 3, 3, 6, 0, 1, 0, 2, 0, 1])
 #tmp = solver([7, 5, 8, 10, 11, 5, 11, 4, 7, 4, 8, 2, 11, 6])
@@ -301,7 +262,7 @@ tmp = solver([7, 10, 2, 1, 1, 5, 5, 4, 4, 5, 11, 8, 11, 5])
 #tmp = solver([6, 3, 1, 3, 3, 3, 7, 3, 6, 6, 8, 1, 9, 2]) # skip
 #tmp = solver([6, 7, 10, 9, 1, 4, 5, 1, 7, 2, 1, 2, 2, 10])
 #tmp = solver([5, 11, 6, 1, 4, 3, 5, 7, 1, 10, 5, 6, 11, 9]) # UR3- DR5- DL0+ UL3- U3+ R3- D1+ L2- ALL6+ y2 U3- R3+ D5+ L1+ ALL2- DR DL UL
-#tmp = solver([6, 3, 10, 2, 3, 5, 8, 5, 9, 4, 4, 6, 7, 6]) # UR6+ DR5+ DL3+ UL1+ U5+ R3+ D6+ L5- ALL6+ y2 U2- R1+ D0+ L2- ALL6+ DR UL
+tmp = solver([6, 3, 10, 2, 3, 5, 8, 5, 9, 4, 4, 6, 7, 6]) # UR6+ DR5+ DL3+ UL1+ U5+ R3+ D6+ L5- ALL6+ y2 U2- R1+ D0+ L2- ALL6+ DR UL
 print(len(tmp[0]), tmp[0], tmp[1], time() - strt)
 #print(solver([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0]))
 #print(solver([9, 3, 3, 0, 3, 3, 9, 0, 9, 3, 3, 3, 3, 3]))
