@@ -91,7 +91,7 @@ def search(phase, depth, state, strt_idx, solution_strt):
             if phase == 2:
                 if n_dis == 0:
                     return [[[[i for i in j] for j in solution], 0]]
-                #if n_depth == 0 else n_depth # Although the depth is 0, if you turn both layers (and the amount of twist is small), the cost does not increase
+                # Although the depth is 0, if you turn both layers (and the amount of twist is small), the cost does not increase
                 if n_dis <= n_depth + len(solution[solution_strt:]) * grip_cost + sum([max(i[1], abs(12 - i[1])) for i in solution[solution_strt:]]):
                     tmp = search(phase, n_depth, n_state, n_strt_idx, solution_strt)
                     if tmp:
@@ -99,7 +99,7 @@ def search(phase, depth, state, strt_idx, solution_strt):
             else:
                 if n_dis == 0:
                     solved_solution.append([[[i for i in j] for j in solution], n_next_dis])
-                #if n_depth == 0 else n_depth # Although the depth is 0, if you turn both layers (and the amount of twist is small), the cost does not increase
+                # Although the depth is 0, if you turn both layers (and the amount of twist is small), the cost does not increase
                 if n_dis <= n_depth + len(solution[solution_strt:]) * grip_cost + sum([max(i[1], abs(12 - i[1])) for i in solution[solution_strt:]]):
                     tmp = search(phase, n_depth, n_state, n_strt_idx, solution_strt)
                     if tmp:
@@ -110,6 +110,7 @@ def search(phase, depth, state, strt_idx, solution_strt):
 def solver_p(phase, state, pre_solution, pre_cost):
     global solution
     dis, n_dis = distance(phase, state)
+    print(dis)
     strt = len(pre_solution)
     res = []
     #print(state)
@@ -131,6 +132,7 @@ def solver_p(phase, state, pre_solution, pre_cost):
             break
     #print('done', phase, len(res))
     #print(res[0])
+    #res.sort(key=lambda x:x[0] + x[1])
     return res
 
 def solver(state):
@@ -141,11 +143,11 @@ def solver(state):
     for phase in range(3):
         for cost, _, state, phase_solution in states:
             n_states.extend(solver_p(phase, state, phase_solution, cost))
+        n_states.sort(key=lambda x: x[0] + x[1])
         if phase == 0:
-            states = deepcopy(n_states)
+            states = deepcopy(n_states[:min(len(n_states), 5)])
             n_states = []
         elif phase == 1:
-            n_states.sort(key=lambda x: x[0] + x[1])
             states = [deepcopy(n_states[0])]
             n_states = []
     chosen_solution = n_states[0][3]
@@ -173,7 +175,7 @@ lens = []
 costs = []
 scrambles = []
 cnt = 0
-num = 100 #100000
+num = 50 #100000
 for i in range(num):
     strt = time()
     test_cube = [randint(0, 11) for _ in range(14)]

@@ -3,16 +3,17 @@
 from time import time, sleep
 import serial
 
-def send_command(num, arg1, arg2=None, arg3=None):
+def send_command_pins(pins):
     com = ''
-    if num:
-        com += str(arg1) + ' ' + str(arg2) + ' '
-        for i in arg3:
-            com += str(int(i)) + ' '
-    else:
-        for i in arg1:
-            com += str(int(i)) + ' '
-    ser_motor[num].write((com + '\n').encode())
+    for i in pins:
+        com += str(int(i)) + ' '
+    ser_motor[0].write((com + '\n').encode())
+
+def send_command_motors(rpm, twist1, twist2, move_motors):
+    com = str(rpm) + ' ' + str(twist1) + ' ' + str(twist2) + ' '
+    for i in move_motors:
+        com += str(int(i)) + ' '
+    ser_motor[1].write((com + '\n').encode())
 
 def controller(solution, rpm, slp_tim, ratio):
     strt_solv = time()
@@ -21,23 +22,26 @@ def controller(solution, rpm, slp_tim, ratio):
     while idx < len_solution:
         pins, direction, twist = solution[idx]
         #print(pins, direction, twist)
-        send_command(0, pins)
+        send_command_pins(pins)
         sleep(slp_tim)
         move_motors = [int(i) == direction for i in pins]
         twist_fixed = twist * 30
         if twist_fixed > 180:
             twist_fixed = twist_fixed - 360
-        send_command(1, twist_fixed, rpm, move_motors)
+        twist1 = twist_fixed
+        twist2 = 0
         max_twist = abs(twist_fixed)
         if idx + 1 < len_solution and solution[idx + 1][0] == pins:
-            n_pins, n_direction, n_twist = solution[idx + 1]
-            n_move_motors = [int(i) == n_direction for i in n_pins]
+            _, _, n_twist = solution[idx + 1]
             n_twist_fixed = n_twist * 30
             if n_twist_fixed > 180:
                 n_twist_fixed = n_twist_fixed - 360
-            send_command(1, n_twist_fixed, rpm, n_move_motors)
+            twist2 = n_twist_fixed
             max_twist = max(max_twist, abs(n_twist_fixed))
             idx += 1
+        print(twist1, twist2)
+        print([int(i) for i in move_motors])
+        send_command_motors(rpm, twist1, twist2, move_motors)
         slp_tim_motor = 2 * 60 / rpm * max_twist / 360 * ratio
         sleep(slp_tim_motor)
         idx += 1
