@@ -11,8 +11,8 @@ def detector(direction):
     ret, frame = capture.read()
     size_x = 240
     size_y = 180
-    center_x = 120
-    center_y = 90
+    center_x = 123
+    center_y = 92
     frame = cv2.resize(frame, (size_x, size_y))
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     dis = 52
@@ -30,12 +30,12 @@ def detector(direction):
                     x_circle = int(x + r * sin(deg * pi / 180))
                     y_circle = int(y - r * cos(deg * pi / 180))
                     value[tim] += gray[y_circle, x_circle]
-                '''
+                
                 for r in range(radius // 3, radius // 3 * 2):
                     x_circle = int(x + r * sin(deg * pi / 180))
                     y_circle = int(y - r * cos(deg * pi / 180))
                     cv2.circle(gray, (x_circle, y_circle), 1, (255, 255, 255), thickness=1, lineType=cv2.LINE_8, shift=0)
-                '''
+                
                 value[tim] //= radius // 3
             min_value_idx = value.index(min(value))
             max_value_idx = value.index(max(value))
@@ -55,7 +55,8 @@ def detector(direction):
             deg = 30 * j
             x_circle = int(x + radius // 4 * 3 * sin(deg * pi / 180))
             y_circle = int(y - radius // 4 * 3 * cos(deg * pi / 180))
-            #cv2.circle(gray, (x_circle, y_circle), 3, (0, 0, 0), thickness=3, lineType=cv2.LINE_8, shift=0)
+            cv2.circle(gray, (x_circle, y_circle), 3, (0, 0, 0), thickness=3, lineType=cv2.LINE_8, shift=0)
+        #cv2.imwrite('test.png', gray)
         #cv2.imshow('title',gray)
         #if cv2.waitKey(1) & 0xFF == ord('q'):
         #    break

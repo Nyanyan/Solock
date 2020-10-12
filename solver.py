@@ -110,7 +110,7 @@ def search(phase, depth, state, strt_idx, solution_strt):
 def solver_p(phase, state, pre_solution, pre_cost):
     global solution
     dis, n_dis = distance(phase, state)
-    print(dis)
+    #print(dis)
     strt = len(pre_solution)
     res = []
     #print(state)

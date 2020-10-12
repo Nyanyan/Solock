@@ -39,8 +39,8 @@ def controller(solution, rpm, slp_tim, ratio):
             twist2 = n_twist_fixed
             max_twist = max(max_twist, abs(n_twist_fixed))
             idx += 1
-        print(twist1, twist2)
-        print([int(i) for i in move_motors])
+        #print(twist1, twist2)
+        #print([int(i) for i in move_motors])
         send_command_motors(rpm, twist1, twist2, move_motors)
         slp_tim_motor = 2 * 60 / rpm * max_twist / 360 * ratio
         sleep(slp_tim_motor)
