@@ -5,7 +5,7 @@ int idx = 0;
 long data[4];
 
 void push(int sol0, int sol1, int sol2, int sol3) {
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 2; i++) {
     if (sol0) {
       digitalWrite(pushers[0], HIGH);
     } else {

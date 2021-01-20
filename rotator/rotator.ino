@@ -29,8 +29,8 @@ void move_motor(long spd, long deg1, long deg2, int motor0, int motor1, int moto
   long steps1 = abs(deg1) * turn_steps / 360;
   long steps2 = abs(deg2) * turn_steps / 360;
   long avg_time = 1000000 * 60 / turn_steps / spd;
-  long max_time = 1500;
-  long slope = 12;
+  long max_time = 300;
+  long slope = 10;
   long accel = min(max(steps1, steps2), max(0, (max_time - avg_time) / slope));
   bool motor_hl = false;
   for (int i = 0; i < max(steps1, steps2); i++) {
@@ -48,7 +48,7 @@ void move_motor(long spd, long deg1, long deg2, int motor0, int motor1, int moto
       if (!motor3) digitalWrite(step_pul[3], motor_hl);
     }
     long delay_time = avg_time;
-    //if (i < accel) delay_time = max_time - slope * i;
+    if (i < accel) delay_time = max_time - slope * i;
     delayMicroseconds(delay_time);
   }
   /*

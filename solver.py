@@ -238,7 +238,7 @@ with open('corner_cost.csv', mode='r') as f:
 
 print('solver initialized')
 
-
+'''
 from time import time
 
 from random import randint
@@ -266,7 +266,7 @@ print('avg', sum(tims) / cnt, 'sec', 'max', max(tims), 'sec')
 print('avg', sum(lens) / cnt, 'moves', 'max', max(lens), 'moves')
 print('avg', sum(costs) / cnt, 'cost', 'max', max(costs), 'cost')
 print('longest time scramble', scrambles[tims.index(max(tims))])
-'''
+
 strt = time()
 #tmp = solver([11, 10, 9, 9, 2, 1, 8, 7, 4, 1, 5, 0, 4, 1])
 #tmp = solver([7, 10, 2, 1, 1, 5, 5, 4, 4, 5, 11, 8, 11, 5])
