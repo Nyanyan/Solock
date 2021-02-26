@@ -8,11 +8,23 @@ from detector import detector
 from controller import controller
 
 def create_clock(state=None):
+    global canvas, inspection, start_medium, solvingtimevar, solvingtime
     grid = 28
     offset = 50
     dis = 10
     radius = 20
-    canvas.delete()
+    canvas.delete("all")
+
+    inspection = tkinter.Button(root, text="inspection", command=inspection_p)
+    inspection.place(x=0, y=0)
+
+    start_medium = tkinter.Button(root, text="start", command=start_medium_p)
+    start_medium.place(x=250, y=0)
+
+    solvingtimevar = tkinter.StringVar(master=root, value='info')
+    solvingtime = tkinter.Label(textvariable=solvingtimevar)
+    solvingtime.place(x=120, y=20)
+    
     for i in range(3):
         for j in range(6):
             x = j * grid + offset + j // 3 * dis
@@ -63,14 +75,14 @@ def inspection_p():
         inspection_lower.place_forget()
         inspection_upper.place_forget()
         inspection_finish.place_forget()
-        create_clock(state)
         solution, cost = solver(state)
         print(state)
         print(cost)
         #print(solution)
-        with open('log.txt', mode='w') as f:
-            f.write(str(state) + '\n')
-            f.write(str(solution) + '\n')
+        #with open('log.txt', mode='w') as f:
+        #    f.write(str(state) + '\n')
+        #    f.write(str(solution) + '\n')
+        create_clock(state)
     inspection_upper = tkinter.Button(root, text="upper", command=inspection_upper_p)
     inspection_upper.place(x=0, y=25)
     inspection_lower = tkinter.Button(root, text="lower", command=inspection_lower_p)
@@ -79,7 +91,7 @@ def inspection_p():
     inspection_finish.place(x=0, y=75)
 
 def start_medium_p():
-    solvingtimevar.set(controller(solution, 340, 0.035, 0.78)) # 305, 0.035, 0.73
+    solvingtimevar.set(controller(solution, 445, 0.05, 0.85)) # 305, 0.035, 0.73
 
 
 solution = []
@@ -87,6 +99,7 @@ state = [-1 for _ in range(14)]
 root = tkinter.Tk()
 root.title("Solock")
 root.geometry("320x240")
+
 canvas = tkinter.Canvas(root, width = 320, height = 240)
 
 inspection = tkinter.Button(root, text="inspection", command=inspection_p)

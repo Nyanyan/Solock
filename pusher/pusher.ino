@@ -26,10 +26,10 @@ void push(int sol0, int sol1, int sol2, int sol3) {
     } else {
       digitalWrite(pushers[7], HIGH);
     }
-    delay(20);
+    delay(40);
     for (int j = 0; j < 8; j++)
       digitalWrite(pushers[j], LOW);
-    delay(20);
+    delay(10);
   }
 }
 
