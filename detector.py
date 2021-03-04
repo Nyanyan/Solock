@@ -69,7 +69,7 @@ def detector(direction):
                 cv2.circle(gray, (x_circle, y_circle), 3, (0, 0, 0), thickness=3, lineType=cv2.LINE_8, shift=0)
             #cv2.circle(gray, (x, y), (dy * 3 + dx + 2) * 3, (0, 0, 0), thickness=3, lineType=cv2.LINE_8, shift=0)
         #print(clocks)
-        cv2.imwrite('test.png', gray)
+        #cv2.imwrite('test.png', gray)
         #cv2.imshow('title',gray)
         #if cv2.waitKey(1) & 0xFF == ord('q'):
         #    break

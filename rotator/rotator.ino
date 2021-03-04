@@ -1,5 +1,5 @@
 const int magnet_threshold = 50;
-const long turn_steps = 800;
+const long turn_steps = 400 * 2;
 const int step_dir[4] = {9, 14, 11, 7};
 const int step_pul[4] = {10, 15, 12, 8};
 //const int step_dir[4] = {11, 9, 14, 7};
@@ -12,8 +12,8 @@ long data[7];
 void move_motor(long spd, long deg1, long deg2, int motor0, int motor1, int motor2, int motor3) {
   bool hl1 = true;
   bool hl2 = true;
-  if (deg1 < 0) hl1 = false;
-  if (deg2 < 0) hl2 = false;
+  if (deg1 > 0) hl1 = false;
+  if (deg2 > 0) hl2 = false;
   if (deg1) {
     if (motor0) digitalWrite(step_dir[0], hl1);
     if (motor1) digitalWrite(step_dir[1], hl1);
@@ -29,7 +29,7 @@ void move_motor(long spd, long deg1, long deg2, int motor0, int motor1, int moto
   long steps1 = abs(deg1) * turn_steps / 360;
   long steps2 = abs(deg2) * turn_steps / 360;
   long avg_time = 1000000 * 60 / turn_steps / spd;
-  long max_time = 300;
+  long max_time = 375;
   long slope = 10;
   long accel = min(max(steps1, steps2), max(0, (max_time - avg_time) / slope));
   bool motor_hl = false;
@@ -81,6 +81,7 @@ void move_motor(long spd, long deg1, long deg2, int motor0, int motor1, int moto
     delayMicroseconds(max_time - slope * accel + accel * (i + 1));
     }
   */
+  Serial.println("a");
 }
 
 void setup() {

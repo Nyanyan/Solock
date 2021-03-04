@@ -24,7 +24,7 @@ def create_clock(state=None):
     solvingtimevar = tkinter.StringVar(master=root, value='info')
     solvingtime = tkinter.Label(textvariable=solvingtimevar)
     solvingtime.place(x=120, y=20)
-    
+
     for i in range(3):
         for j in range(6):
             x = j * grid + offset + j // 3 * dis
@@ -91,7 +91,7 @@ def inspection_p():
     inspection_finish.place(x=0, y=75)
 
 def start_medium_p():
-    solvingtimevar.set(controller(solution, 445, 0.05, 0.85)) # 305, 0.035, 0.73
+    solvingtimevar.set(controller(solution, 560, 0.079, 1.0)) # 440, 0.085, 1.0
 
 
 solution = []
