@@ -1,7 +1,5 @@
-//#include <SoftwareSerial.h>
 #include <TimerOne.h>
 
-//SoftwareSerial mySerial(10, 11);
 long strt;
 bool flag;
 String out;
@@ -32,7 +30,6 @@ void setup() {
   pinMode(13, OUTPUT);
   pinMode(12, INPUT);
   Serial.begin(1200);
-  //mySerial.begin(9600);
   flag = false;
   tone_hl = false;
   former_tmp = "000000";
@@ -47,6 +44,6 @@ void loop() {
       strt = millis();
     flag = !flag;
     tone(13, 440, 300);
-    delay(100);
+    while(digitalRead(12));
   }
 }
