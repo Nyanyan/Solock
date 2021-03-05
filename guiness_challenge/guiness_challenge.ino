@@ -5,15 +5,10 @@ bool flag;
 String out;
 String former_tmp;
 bool tone_hl;
+String tmp;
 
 void send_data() {
   out = " ";
-  String tmp;
-  if (flag)
-    tmp = "000000" + String(millis() - strt);
-  else
-    tmp = former_tmp;
-  former_tmp = tmp;
   char checksum = 64;
   int l = tmp.length();
   for (int i = 6; i >= 1; i--) {
@@ -44,6 +39,11 @@ void loop() {
       strt = millis();
     flag = !flag;
     tone(13, 440, 300);
-    while(digitalRead(12));
+    while (digitalRead(12));
   }
+  if (flag)
+    tmp = "000000" + String(millis() - strt);
+  else
+    tmp = former_tmp;
+  former_tmp = tmp;
 }
