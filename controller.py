@@ -14,6 +14,7 @@ def send_command_motors(rpm, twist1, twist2, move_motors):
     com = str(rpm) + ' ' + str(twist1) + ' ' + str(twist2) + ' '
     for i in move_motors:
         com += str(int(i)) + ' '
+    #print(com)
     ser_motor[1].write((com + '\n').encode())
 
 def controller(solution, rpm, slp_tim, ratio):
